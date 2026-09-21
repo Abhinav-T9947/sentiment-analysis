@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: transparent;
+        }
+
+        .container {
+            width: 100%;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 140px;
+            box-sizing: border-box;
+            padding: 14px;
+
+            border: 1px solid #cccccc;
+            border-radius: 8px;
+
+            font-size: 16px;
+            line-height: 1.5;
+
+            resize: vertical;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: #4a90e2;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 15px;
+            padding: 13px;
+
+            border: none;
+            border-radius: 8px;
+
+            background: #ff4b4b;
+            color: white;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #e63939;
+        }
+
+        .status {
+            margin-top: 8px;
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+        }
+    </style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <textarea
+        id="review"
+        placeholder="Start typing your review..."
+        spellcheck="true">
+    </textarea>
+
+    <button id="analyzeButton">
+        🔍 ANALYZE REVIEW
+    </button>
+
+    <div
+        id="status"
+        class="status">
+    </div>
+
+</div>
+
+
+<script>
+
+const textarea =
+    document.getElementById("review");
+
+const analyzeButton =
+    document.getElementById("analyzeButton");
+
+const status =
+    document.getElementById("status");
+
+
+let initialized = false;
+
+
+/* =========================================
+   SEND VALUE TO STREAMLIT
+========================================= */
+
+function sendValue(value) {
+
+    window.parent.postMessage(
+        {
+            type: "streamlit:setComponentValue",
+            value: value
+        },
+        "*"
+    );
+}
+
+
+/* =========================================
+   SET HEIGHT
+========================================= */
+
+function setHeight() {
+
+    window.parent.postMessage(
+        {
+            type: "streamlit:setFrameHeight",
+            height: document.body.scrollHeight + 20
+        },
+        "*"
+    );
+}
+
+
+/* =========================================
+   ANALYZE BUTTON
+========================================= */
+
+analyzeButton.addEventListener(
+    "click",
+    function() {
+
+        const value =
+            textarea.value.trim();
+
+        if (!value) {
+
+            status.textContent =
+                "⚠️ Please enter a review first.";
+
+            return;
+        }
+
+        status.textContent =
+            "Analyzing review...";
+
+        sendValue(value);
+    }
+);
+
+
+/* =========================================
+   RECEIVE STREAMLIT DATA
+========================================= */
+
+window.addEventListener(
+    "message",
+    function(event) {
+
+        const data =
+            event.data;
+
+        if (!data || !data.type) {
+            return;
+        }
+
+
+        if (
+            data.type ===
+            "streamlit:render"
+        ) {
+
+            const args =
+                data.args || {};
+
+
+            if (
+                !initialized &&
+                typeof args.value === "string"
+            ) {
+
+                textarea.value =
+                    args.value;
+            }
+
+
+            if (
+                args.placeholder
+            ) {
+
+                textarea.placeholder =
+                    args.placeholder;
+            }
+
+
+            initialized = true;
+
+            setHeight();
+        }
+
+    }
+);
+
+
+/* =========================================
+   COMPONENT READY
+========================================= */
+
+window.parent.postMessage(
+    {
+        type:
+            "streamlit:componentReady",
+
+        apiVersion: 1
+    },
+    "*"
+);
+
+
+setHeight();
+
+</script>
+
+</body>
+
+</html>
+
