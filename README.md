@@ -131,6 +131,26 @@ The project includes an interactive Streamlit web interface.
 * ⚠️ Ambiguous review detection
 * ⚠️ Unknown-word handling
 
+## 📸 Application Screenshots
+
+### 🔤 Live Autocomplete
+
+The application provides live movie-review sentence suggestions while the user types.
+
+![Live Autocomplete](screenshots/screenshot_autocomplete.png)
+
+### 😊 Positive Sentiment Prediction
+
+Example of a positive movie review prediction with confidence and sentiment probability.
+
+![Positive Prediction](screenshots/screenshot_positive.png)
+
+### 😞 Negative Sentiment Prediction
+
+Example of a negative movie review prediction.
+
+![Negative Prediction](screenshots/screenshot_negative.png)
+
 ### Application Workflow
 
 ```text
